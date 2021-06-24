@@ -26,4 +26,21 @@ module.exports = {
       sanitizeEntity(entity, { model: strapi.models.article })
     );
   },
+  async create(ctx) {
+    let entity;
+    const user = ctx.state.user.id;
+    if (ctx.is("multipart")) {
+      const { data, files } = parseMultipartData(ctx);
+      entity = await strapi.services.article.create(
+        { ...data, user },
+        { files }
+      );
+    } else {
+      entity = await strapi.services.article.create({
+        ...ctx.request.body,
+        user,
+      });
+    }
+    return sanitizeEntity(entity, { model: strapi.models.article });
+  },
 };
